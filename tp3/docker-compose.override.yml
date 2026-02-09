@@ -1,0 +1,28 @@
+services:
+  # En dev, on expose le port PostgreSQL
+  db:
+    ports:
+      - "5432:5432"
+    labels:
+      - "environment=development"
+
+  # En dev, on monte le code source pour hot reload
+  api:
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    labels:
+      - "environment=development"
+
+  adminer:
+    labels:
+      - "environment=development"
+
+  redis:
+    labels:
+      - "environment=development"
+
+  nginx:
+    labels:
+      - "environment=development"
+

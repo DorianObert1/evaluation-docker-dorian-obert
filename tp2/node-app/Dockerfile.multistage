@@ -1,0 +1,41 @@
+# Stage 1 : builder
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json .
+
+# Installer toutes les dépendances
+RUN npm install
+
+COPY app.js .
+
+# Exécuter les tests
+RUN npm test
+
+# Stage 2: production
+FROM node:18-alpine AS production
+
+WORKDIR /app
+
+# Créer un utilisateur non-root pour la sécurité
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -D appuser
+
+COPY package.json .
+
+# Installer uniquement les dépendances de production
+RUN npm install --omit=dev
+
+COPY app.js .
+
+# Changer le propriétaire des fichiers
+RUN chown -R appuser:appgroup /app
+
+# Utiliser l'utilisateur non-root
+USER appuser
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+
